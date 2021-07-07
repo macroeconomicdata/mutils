@@ -1,6 +1,6 @@
 # mutils
 
-Matlab utilities for time series (and other) data developed in collaboration the the [BCC](bccprogramme.ch)
+Matlab utilities for time series (and other) data developed in collaboration the the [BCC](www.bccprogramme.org)
 
 ## Description
 
