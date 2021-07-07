@@ -4,7 +4,7 @@ Matlab utilities for time series (and other) data developed in collaboration the
 
 ## Description
 
-These utilities perform basic functions like processing data and estimating simple models, including OLS models, vector autoregressions, and unrestricted MIDAS models form monthly/quarterly mixed frequency data. Examples are included in the sample\_scripts folder. All functions work with base matlab, however, seasonal adjustment requires the (free) [X-13 toolbox](https://www.mathworks.com/matlabcentral/fileexchange/49120-x-13-toolbox-for-seasonal-filtering).
+These utilities perform basic functions like processing data and estimating simple models, including OLS models, vector autoregressions, and unrestricted MIDAS models form monthly/quarterly mixed frequency data. Examples are included in the sample\_scripts folder. All functions work with base Matlab, however, seasonal adjustment requires the (free) [X-13 toolbox](https://www.mathworks.com/matlabcentral/fileexchange/49120-x-13-toolbox-for-seasonal-filtering).
 
 ## Functions
 
