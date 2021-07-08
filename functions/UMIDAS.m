@@ -57,19 +57,18 @@ y = y(first_obs:end,:);
 X = X(first_obs:end,:);
 months = months(first_obs:end,:);
 
-
 M1=X(ismember(months,[1,4,7,10]), include_months >= 1 );
 
-[T,k] = size(M1);
+T = size(M1,1);
 
 M2=X(ismember(months,[2,5,8,11]), include_months >= 2);
 if size(M2,1) < T
-    M2 = [M2; NaN(1, k)]; % add a NaN val if Q2 is missing
+    M2 = [M2; NaN(1, size(M2,2))]; % add a NaN val if Q2 is missing
 end
 
 M3=X(ismember(months,[3,6,9,12]),  include_months >= 3);
 if size(M3,1) < T
-   M3 = [M3; NaN(1, k)]; % add a NaN val if Q3 is missing
+   M3 = [M3; NaN(1, size(M3,2))]; % add a NaN val if Q3 is missing
 end
 
 lhs_idx = ismember(months,[3,6,9,12]); 
@@ -77,7 +76,7 @@ Time = yf.Time(lhs_idx);
 lhs = y(lhs_idx, :); % End of quarter values
 if size(lhs,1) < T
         lhs = [lhs; NaN(1, 1)]; % add a NaN val quarter val is missing
-        Time = [Time; Time(end) + calquarters(1)]
+        Time = [Time; Time(end) + calquarters(1)];
 end
     
 if lags > 0  

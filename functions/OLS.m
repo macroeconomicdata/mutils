@@ -31,17 +31,29 @@ elseif nargin == 4
     ridge = varargin{1};
     intercept = varargin{2};
     verbose  = false;
-    cnames = (1:size(X,2))';
+    if intercept
+        cnames = (0:size(X,2))';
+    else
+        cnames = (1:size(X,2))';
+    end    
 elseif nargin == 5
     ridge = varargin{1};
     intercept = varargin{2};
     verbose  = varargin{3};
-    cnames = (1:size(X,2))';
+    if intercept
+        cnames = (0:size(X,2))';
+    else
+        cnames = (1:size(X,2))';
+    end    
 else
     ridge = varargin{1};
     intercept = varargin{2};
     verbose  = varargin{3};
-    cnames = varargin{4};
+    if intercept
+        cnames = ['intercept'; varargin{4}];
+    else
+        cnames = varargin{4};
+    end  
 end
 
 %% Format input data
@@ -70,7 +82,11 @@ t_val = beta./sd_beta; % normalized means
 
 %% Print results
 if(verbose)
-    disp(table(cnames, beta, sd_beta, t_val,...
+    if size(cnames,1) ~= size(beta,1)
+        warning('Size of cnames is not correct; not printing output')
+    else
+        disp(table(cnames, beta, sd_beta, t_val,...
            'VariableNames', {' ', 'Coefficients', 'SE', 't value'}))
+    end
 end
 end
