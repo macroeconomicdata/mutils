@@ -49,7 +49,7 @@ end
 
 % Default x-data
 if size(noisy,2)<2
-    noisy = [(1:1:length(noisy))',noisy];
+    noisy = [(1:1:length(noisy))'*(100/length(noisy)),noisy];
 end
 
 %% Smooth the data points

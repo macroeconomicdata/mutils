@@ -96,9 +96,12 @@ for j=1:length(X_names) % loop through each series
     if strcmp(to_do.frequency,'weekly')
         tx = retime(tx,'weekly', 'mean'); 
     end  
+    if strcmp(frq, 'week')
+        tx.ref_date = dateshift(tx.ref_date, 'end', 'week');
+    end
     x = table2array(tx);
     dates_j = tx.Properties.RowTimes;
-    if max(dates_j) < EndDate % && any(strcmp({'monthly', 'quarterly'},to_do.frequency))
+    if max(dates_j) < EndDate && any(strcmp({'monthly', 'quarterly'},to_do.frequency))
         if strcmp(to_do.frequency,'quarterly')
             seq = max(dates_j):calquarters(1):EndDate;
         elseif strcmp(to_do.frequency,'monthly')
@@ -152,7 +155,7 @@ for j=1:length(X_names) % loop through each series
     else
         x_saf = zeros(size(x,1),1); % otherwise seasonal adjustment factor is 0
     end
-    if logical(to_do.take_diffs) % difference 
+    if logical(to_do.take_diffs) % -------- difference -------------------------
         x_level = x;
         x = [NaN; diff(x)]; % take differences, keeping same length
     else
@@ -173,14 +176,11 @@ for j=1:length(X_names) % loop through each series
     end
     % Format dates to line up
     if strcmp(to_do.frequency, 'yearly')
-        dates_j = dateshift(dates_j,'end','year'); % end of year dates
+        dates_j = dateshift(dates_j,'end','year'); % end of quarter dates
     elseif strcmp(to_do.frequency, 'quarterly')
         dates_j = dateshift(dates_j,'end','quarter'); % end of quarter dates
     elseif strcmp(to_do.frequency, 'monthly')
-        dates_j = dateshift(dates_j,'end','month'); % end of month dates
-    end
-    if strcmp(frq, 'week')
-        dates_j = dateshift(dates_j, 'end', 'week');
+        dates_j = dateshift(dates_j,'end','month'); % end of quarter dates
     end
     r_idx = ismember(dates_j, dates); % right index
     l_idx = ismember(dates, dates_j); % left index

@@ -75,7 +75,8 @@ for j=1:length(X_names) % loop through each series
         x_sa = exp(x_sa);
     end    
     % put data into output tables
-    X_sa{:, j} = x_sa;
-    X_nsa{:,j} = x_out; 
+    l_idx = ismember(dates, dates_j); 
+    X_sa{l_idx, j} = x_sa;
+    X_nsa{l_idx,j} = x_out; 
     
 end
