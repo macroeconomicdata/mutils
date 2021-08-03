@@ -2,6 +2,10 @@
 
 Matlab utilities for time series (and other) data developed in collaboration the the [BCC](https://www.bccprogramme.org)
 
+## Download instructions
+
+Download the code as a ZIP file by clicking the green 'Clone or download' button and selecting 'Download ZIP'.
+
 ## Description
 
 These utilities perform basic functions like processing data and estimating simple models, including OLS models, vector autoregressions, and unrestricted MIDAS models for monthly/quarterly mixed frequency data. Examples are included in the sample\_scripts folder. All functions work with base Matlab, however, seasonal adjustment requires the (free) [X-13 toolbox](https://www.mathworks.com/matlabcentral/fileexchange/49120-x-13-toolbox-for-seasonal-filtering).
@@ -28,6 +32,9 @@ These utilities perform basic functions like processing data and estimating simp
 - `[X_sa, X_nsa] = unprocess(Xtimetable, lib, X_level, Tnd, X_saf, X_scale, X_center)` Undo processing from the `process()` function
 - `[B, Sig, Sig_B, fit] = VAR(X, lags, varargin)` Estimate a vector autoregression (VAR)
 
+## Required software and versioning
+
+MATLAB is required to run the code. The code was tested in MATLAB R2015b and later versions. Functionality with earlier versions of MATLAB is not guaranteed.
 
 
 

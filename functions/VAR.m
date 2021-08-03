@@ -4,17 +4,18 @@ function [B, Sig, Sig_B, fit] = VAR(X, lags, varargin) % ridge, intercept, verbo
 %% Inputs
 % X - data as an array
 % lags - the number of lags to include in RHS variables
-% intercept - logical, should we include an intercept term?
-% ridge - ridge parameter to shrink parameter esitmates towards zero
-% verbose - logical, should we print results?
+% Optional arguments: 
+%     ridge - ridge parameter to shrink parameter esitmates towards zero
+%     intercept - logical, should we include an intercept term?
+%     verbose - logical, should we print results?
 %% Output
 % B - parameter estimates
 % Sig - Covariance matrix of shocks to observations
 
 
 if nargin == 2
-    intercept = false;
     ridge = 0;
+    intercept = false;
     verbose = false;
 elseif nargin == 3
     ridge = varargin{1};

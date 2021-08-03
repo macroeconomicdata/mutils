@@ -1,28 +1,36 @@
 function [X_sa, X_nsa] = unprocess(Xtimetable, lib, X_level, Tnd, X_saf, X_scale, X_center)
 %% Description
-% Unprocess data that has been processed using the process() function
-%% Inputs
-% Xtimetable - Input data in timetable format
-% lib - lib file used in process() function
-% X_level - level values from process() function
-% Tnd - trend values from process() function
-% X_saf - seasonal adjustment factors from process() function
-% X_scale - scale parameters from process() function
-% X_center - center (means) parameters from process function
-%% Output
-% X_sa - seasonally adjusted data
-% X_nsa - seasonally unadjusted data
+% Undo the processing done by the function process() to convert predictions
+% back to their original units
 
-%% Create output timetables
+%% Inputs
+% Xtimetable: Predictions of model variables in timetable format
+% lib: library file used in the process() function
+% X_level: log level values of observations from process()
+% Tnd: low frequency trend values of observations from process()
+% X_saf: seasonal adjustment factors from process()
+% X_scale: scale values from process()
+% X_center: center (mean) values from process()
+
+%% Output
+% X_sa: seasonally adjusted data in orignal (level) format
+% X_nsa: seasonally unadjusted data in original (level) format
+
 [T,k] = size(Xtimetable);
 X_names = Xtimetable.Properties.VariableNames; % save variable names
+in_lib = ismember(X_names, lib.series_name);
+if ~all(in_lib)
+    error(strcat(X_names(find(~in_lib,1,'first')), " not found in lib"))
+end
+lib = lib(ismember(lib.series_name, X_names),:);
+frequencies = unique(lib.frequency);
+
 dates = Xtimetable.Time;
 X_sa = array2timetable(NaN(T,k), 'RowTimes', dates); % initialize output for SA data
 X_nsa = array2timetable(NaN(T,k), 'RowTimes', dates); % initialize output for NSA data
 
-%% Loop through data
 for j=1:length(X_names) % loop through each series
-%     disp(X_names(j));
+    disp(X_names(j));
     to_do = lib(strcmp(X_names(j), lib.series_name), :); % get needed adjustments from lib file
     if size(to_do, 1) == 0 % if the data is not in lib, return an error
         error(strcat(X_names(j), " not found in lib"))
@@ -35,20 +43,41 @@ for j=1:length(X_names) % loop through each series
     x_level = table2array(X_level(:,j_idx)); % extract level data for this series
     tnd = table2array(Tnd(:,j_idx)); % trend data for this series
     x_saf = table2array(X_saf(:,j_idx)); % seasonal adjustment factors for this series
-        
-    % Impute missing values in trend for mixed frequency datasets:
-    tnd = spline_fill_plot(tnd); % This function will not fill missing 
-    % observations at the beginning or end of the data. We may want to fill
-    % missing observations at the end of the data to make forecasts or
-    % nowcasts. Thus we'll bring the last observation forward.
-    last_idx = find(~isnan(tnd),1,'last');
-    if last_idx < length(tnd)
-        tnd(last_idx+1:end) = tnd(last_idx);
-    end
-    % Note that this sort of detrending should only be used for near term
-    % forecasting/nowcasting; i.e. applications in which the trend will not
-    % have a large impact on predictions. 
     
+    if strcmp(to_do.frequency, 'quarterly')
+        if(ismember('weekly', frequencies) && ~ismember('daily', frequencies))
+            dates_j = dateshift(dates, 'start', 'week');
+            dates_j = unique(dateshift(dates_j,'end','quarter')); % end of quarter dates
+            dates_j = dateshift(dates_j, 'end', 'week');
+        else
+            dates_j = unique(dateshift(dates,'end','quarter')); % end of quarter dates
+        end        
+        x = x(ismember(dates, dates_j)); % quarterly data
+        x_level = x_level(ismember(dates, dates_j));
+        tnd = tnd(ismember(dates, dates_j));
+        x_saf = x_saf(ismember(dates, dates_j));
+    elseif strcmp(to_do.frequency, 'monthly')
+        if(ismember('weekly', frequencies) && ~ismember('daily', frequencies))
+            dates_j = dateshift(dates, 'start', 'week');
+            dates_j = unique(dateshift(dates_j,'end','month')); % end of month dates
+            dates_j = dateshift(dates_j, 'end', 'week');
+        else
+            dates_j = unique(dateshift(dates,'end','month')); % end of month dates
+        end        
+        x = x(ismember(dates, dates_j)); % monthly data
+        x_level = x_level(ismember(dates, dates_j));
+        tnd = tnd(ismember(dates, dates_j));
+        x_saf = x_saf(ismember(dates, dates_j));
+    elseif strcmp(to_do.frequency, 'weekly')
+        dates_j = unique(dateshift(dates,'end','week')); % end of week dates
+        x = x(ismember(dates, dates_j)); % weekly data
+        x_level = x_level(ismember(dates, dates_j));
+        tnd = tnd(ismember(dates, dates_j));
+        x_saf = x_saf(ismember(dates, dates_j));
+    else % ie daily
+        dates_j = dates;
+    end
+
     x = x + tnd;  % add back in low frequency trends      
     
     if logical(to_do.take_diffs) % did the series get differenced
@@ -75,7 +104,11 @@ for j=1:length(X_names) % loop through each series
         x_sa = exp(x_sa);
     end    
     % put data into output tables
-    X_sa{:, j} = x_sa;
-    X_nsa{:,j} = x_out; 
+    l_idx = ismember(dates, dates_j); 
+    
+    bob = X_sa{l_idx, j} ;
+    
+    X_sa{l_idx, j} = x_sa;
+    X_nsa{l_idx,j} = x_out; 
     
 end
